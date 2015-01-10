@@ -79,13 +79,13 @@ class LTVPNTableViewController: UITableViewController, SimplePingDelegate
         } else {
             let cell = tableView.dequeueReusableCellWithIdentifier(kVPNCellID, forIndexPath: indexPath) as UITableViewCell
             
-            cell.textLabel?.attributedText = cellTitleForIndexPath(indexPath)
+            cell.textLabel.attributedText = cellTitleForIndexPath(indexPath)
             cell.detailTextLabel?.text = vpns[indexPath.row].server
             
             if activatedVPNID == vpns[indexPath.row].ID {
-                cell.imageView!.image = UIImage(named: "CheckMark")
+                cell.imageView.image = UIImage(named: "CheckMark")
             } else {
-                cell.imageView!.image = UIImage(named: "CheckMarkUnchecked")
+                cell.imageView.image = UIImage(named: "CheckMarkUnchecked")
             }
             
             return cell

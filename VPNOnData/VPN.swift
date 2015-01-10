@@ -11,10 +11,11 @@ class VPN : NSManagedObject{
     @NSManaged var title : String!
     
     var ID : String {
-        if let id = objectID.URIRepresentation().lastPathComponent {
-            return id
-        }
-        return ""
+        return objectID.URIRepresentation().lastPathComponent;
+//        if let id = objectID.URIRepresentation().lastPathComponent{
+//            return id
+//        }
+//        return ""
     }
 
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {

@@ -32,7 +32,7 @@ class LTVPNEditViewController: LTVPNCreateViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        saveCell.textLabel?.textColor = UIColor.lightGrayColor()
+        saveCell.textLabel.textColor = UIColor.lightGrayColor()
         
         if let currentVPN = vpn {
             titleTextField!.text = currentVPN.title
@@ -52,7 +52,7 @@ class LTVPNEditViewController: LTVPNCreateViewController {
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let selectedCell = tableView.cellForRowAtIndexPath(indexPath)!
-        if selectedCell == saveCell && selectedCell.textLabel?.textColor == kSaveButtonEnabledColor {
+        if selectedCell == saveCell && selectedCell.textLabel.textColor == kSaveButtonEnabledColor {
             if let currentVPN = vpn {
                 currentVPN.title = titleTextField!.text
                 currentVPN.server = serverTextField!.text
@@ -70,7 +70,7 @@ class LTVPNEditViewController: LTVPNCreateViewController {
                 VPNDataManager.sharedManager.saveContext()
                 
                 saveCell.userInteractionEnabled = false
-                saveCell.textLabel?.textColor = UIColor.lightGrayColor()
+                saveCell.textLabel.textColor = UIColor.lightGrayColor()
                 
                 NSNotificationCenter.defaultCenter().postNotificationName(kLTVPNDidUpdate, object: nil)
             }
@@ -110,10 +110,10 @@ class LTVPNEditViewController: LTVPNCreateViewController {
         if self.titleTextField.text.isEmpty
             || self.accountTextField.text.isEmpty
             || self.serverTextField.text.isEmpty {
-                self.saveCell.textLabel?.textColor = UIColor.lightGrayColor()
+                self.saveCell.textLabel.textColor = UIColor.lightGrayColor()
                 self.saveCell.userInteractionEnabled = false
         } else {
-            self.saveCell.textLabel?.textColor = kSaveButtonEnabledColor
+            self.saveCell.textLabel.textColor = kSaveButtonEnabledColor
             self.saveCell.userInteractionEnabled = true
         }
     }
