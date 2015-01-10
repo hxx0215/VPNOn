@@ -33,16 +33,11 @@
 		D754E2031A3B3A1B00E8F135 /* VPNManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D754E2001A3B3A1B00E8F135 /* VPNManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D754E2041A3B3A1B00E8F135 /* VPNOnKit.h in Headers */ = {isa = PBXBuildFile; fileRef = D754E2011A3B3A1B00E8F135 /* VPNOnKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D754E2071A3B3A7B00E8F135 /* KeychainWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D754E2061A3B3A7B00E8F135 /* KeychainWrapper.swift */; };
-		D754E2081A3B3A7B00E8F135 /* KeychainWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D754E2061A3B3A7B00E8F135 /* KeychainWrapper.swift */; };
 		D754E2171A3B3DE600E8F135 /* VPNOnKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D757AF851A3B370E00AEF3CB /* VPNOnKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D754E21A1A3B3E8E00E8F135 /* VPNOnKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D757AF851A3B370E00AEF3CB /* VPNOnKit.framework */; };
 		D754E21B1A3B3E9F00E8F135 /* VPNOnKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D757AF851A3B370E00AEF3CB /* VPNOnKit.framework */; };
-		D757AF901A3B370E00AEF3CB /* VPNOnKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D757AF851A3B370E00AEF3CB /* VPNOnKit.framework */; };
-		D757AF991A3B370E00AEF3CB /* VPNOnKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D757AF981A3B370E00AEF3CB /* VPNOnKitTests.swift */; };
 		D757AFA71A3B374200AEF3CB /* VPNKeychainWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D757AFA51A3B374200AEF3CB /* VPNKeychainWrapper.swift */; };
-		D757AFA81A3B374200AEF3CB /* VPNKeychainWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D757AFA51A3B374200AEF3CB /* VPNKeychainWrapper.swift */; };
 		D757AFA91A3B374200AEF3CB /* VPNManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D757AFA61A3B374200AEF3CB /* VPNManager.swift */; };
-		D757AFAA1A3B374200AEF3CB /* VPNManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D757AFA61A3B374200AEF3CB /* VPNManager.swift */; };
 		D757AFB31A3B392600AEF3CB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D757AFB21A3B392600AEF3CB /* Foundation.framework */; };
 		D757AFB41A3B392D00AEF3CB /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7453FAE1A31A69100F7E32D /* NetworkExtension.framework */; };
 		D758FE0D1A5BE35000929494 /* LTVPNAboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D758FE0C1A5BE35000929494 /* LTVPNAboutViewController.swift */; };
@@ -62,20 +57,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = D757AF841A3B370E00AEF3CB;
 			remoteInfo = VPNOnKit;
-		};
-		D757AF911A3B370E00AEF3CB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D7453F211A31966F00F7E32D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D757AF841A3B370E00AEF3CB;
-			remoteInfo = VPNOnKit;
-		};
-		D757AF931A3B370E00AEF3CB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D7453F211A31966F00F7E32D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D7453F281A31966F00F7E32D;
-			remoteInfo = VPNOn;
 		};
 		D757AFAF1A3B379000AEF3CB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -143,7 +124,6 @@
 		D754E2061A3B3A7B00E8F135 /* KeychainWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainWrapper.swift; sourceTree = "<group>"; };
 		D757AF851A3B370E00AEF3CB /* VPNOnKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = VPNOnKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D757AF881A3B370E00AEF3CB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D757AF8F1A3B370E00AEF3CB /* VPNOnKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VPNOnKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D757AF971A3B370E00AEF3CB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D757AF981A3B370E00AEF3CB /* VPNOnKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNOnKitTests.swift; sourceTree = "<group>"; };
 		D757AFA51A3B374200AEF3CB /* VPNKeychainWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNKeychainWrapper.swift; sourceTree = "<group>"; };
@@ -181,14 +161,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D757AF8C1A3B370E00AEF3CB /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D757AF901A3B370E00AEF3CB /* VPNOnKit.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -211,7 +183,6 @@
 				D7453F291A31966F00F7E32D /* VPN On.app */,
 				D74C91A51A383FEC00EAAAE1 /* TodayWidget.appex */,
 				D757AF851A3B370E00AEF3CB /* VPNOnKit.framework */,
-				D757AF8F1A3B370E00AEF3CB /* VPNOnKitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -406,25 +377,6 @@
 			productReference = D757AF851A3B370E00AEF3CB /* VPNOnKit.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		D757AF8E1A3B370E00AEF3CB /* VPNOnKitTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = D757AFA21A3B370F00AEF3CB /* Build configuration list for PBXNativeTarget "VPNOnKitTests" */;
-			buildPhases = (
-				D757AF8B1A3B370E00AEF3CB /* Sources */,
-				D757AF8C1A3B370E00AEF3CB /* Frameworks */,
-				D757AF8D1A3B370E00AEF3CB /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				D757AF921A3B370E00AEF3CB /* PBXTargetDependency */,
-				D757AF941A3B370E00AEF3CB /* PBXTargetDependency */,
-			);
-			name = VPNOnKitTests;
-			productName = VPNOnKitTests;
-			productReference = D757AF8F1A3B370E00AEF3CB /* VPNOnKitTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -471,10 +423,6 @@
 						CreatedOnToolsVersion = 6.1.1;
 						DevelopmentTeam = G65933C85Y;
 					};
-					D757AF8E1A3B370E00AEF3CB = {
-						CreatedOnToolsVersion = 6.1.1;
-						TestTargetID = D7453F281A31966F00F7E32D;
-					};
 				};
 			};
 			buildConfigurationList = D7453F241A31966F00F7E32D /* Build configuration list for PBXProject "VPNOn" */;
@@ -493,7 +441,6 @@
 				D7453F281A31966F00F7E32D /* VPNOn */,
 				D74C91A41A383FEC00EAAAE1 /* TodayWidget */,
 				D757AF841A3B370E00AEF3CB /* VPNOnKit */,
-				D757AF8E1A3B370E00AEF3CB /* VPNOnKitTests */,
 			);
 		};
 /* End PBXProject section */
@@ -514,13 +461,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D74C91AD1A383FED00EAAAE1 /* MainInterface.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D757AF8D1A3B370E00AEF3CB /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -564,17 +504,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D757AF8B1A3B370E00AEF3CB /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D757AFA81A3B374200AEF3CB /* VPNKeychainWrapper.swift in Sources */,
-				D754E2081A3B3A7B00E8F135 /* KeychainWrapper.swift in Sources */,
-				D757AFAA1A3B374200AEF3CB /* VPNManager.swift in Sources */,
-				D757AF991A3B370E00AEF3CB /* VPNOnKitTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -587,16 +516,6 @@
 			isa = PBXTargetDependency;
 			target = D757AF841A3B370E00AEF3CB /* VPNOnKit */;
 			targetProxy = D754E2141A3B3DD900E8F135 /* PBXContainerItemProxy */;
-		};
-		D757AF921A3B370E00AEF3CB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D757AF841A3B370E00AEF3CB /* VPNOnKit */;
-			targetProxy = D757AF911A3B370E00AEF3CB /* PBXContainerItemProxy */;
-		};
-		D757AF941A3B370E00AEF3CB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D7453F281A31966F00F7E32D /* VPNOn */;
-			targetProxy = D757AF931A3B370E00AEF3CB /* PBXContainerItemProxy */;
 		};
 		D757AFB01A3B379000AEF3CB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -824,38 +743,6 @@
 			};
 			name = Release;
 		};
-		D757AFA31A3B370F00AEF3CB /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = VPNOnKitTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VPN On.app/VPN On";
-			};
-			name = Debug;
-		};
-		D757AFA41A3B370F00AEF3CB /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = VPNOnKitTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VPN On.app/VPN On";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -891,15 +778,6 @@
 			buildConfigurations = (
 				D757AF9F1A3B370F00AEF3CB /* Debug */,
 				D757AFA01A3B370F00AEF3CB /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		D757AFA21A3B370F00AEF3CB /* Build configuration list for PBXNativeTarget "VPNOnKitTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D757AFA31A3B370F00AEF3CB /* Debug */,
-				D757AFA41A3B370F00AEF3CB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
