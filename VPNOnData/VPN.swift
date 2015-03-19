@@ -2,28 +2,64 @@ import Foundation
 import CoreData
 import VPNOnKit
 
+public class VPNInfo {
+    var title:          String = ""
+    var server:         String = ""
+    var account:        String = ""
+    var password:       String = ""
+    var group:          String = ""
+    var secret:         String = ""
+    var alwaysOn:       Bool   = false
+    var enabled:        Bool   = true
+    var latency:        Int16  = -1
+    var latitude:       Float  = 0.0
+    var longitude:      Float  = 0.0
+    var countryCode:    String = ""
+    var isp:            String = ""
+    var ikev2:          Bool   = false
+    var certificateURL: String = ""
+}
+
 @objc(VPN)
-class VPN : NSManagedObject{
+public class VPN : NSManagedObject{
     
-	@NSManaged var account : String!
-	@NSManaged var group : String!
-	@NSManaged var server : String!
-    @NSManaged var title : String!
+	@NSManaged var account:        String!
+	@NSManaged var group:          String!
+	@NSManaged var server:         String!
+    @NSManaged var title:          String!
+    @NSManaged var alwaysOn:       Bool
+    @NSManaged var enabled:        Bool
+    @NSManaged var latency:        Int16
+    @NSManaged var latitude:       Float
+    @NSManaged var longitude:      Float
+    @NSManaged var countryCode:    String?
+    @NSManaged var isp:            String?
+    @NSManaged var ikev2:          Bool
+    @NSManaged var certificateURL: String?
     
     var ID : String {
-        return objectID.URIRepresentation().lastPathComponent;
-//        if let id = objectID.URIRepresentation().lastPathComponent{
-//            return id
-//        }
-//        return ""
-    }
 
+        if let id = objectID.URIRepresentation().absoluteString {
+            return id
+        }
+        return ""
+    }
+    
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
-        setValue(account, forKey: "account")
-        setValue(group, forKey: "group")
-        setValue(server, forKey: "server")
-        setValue(title, forKey: "title")
+        setValue(account,        forKey: "account")
+        setValue(group,          forKey: "group")
+        setValue(server,         forKey: "server")
+        setValue(title,          forKey: "title")
+        setValue(alwaysOn,       forKey: "alwaysOn")
+        setValue(enabled,        forKey: "enabled")
+        setValue(Int(latency),   forKey: "latency")
+        setValue(latitude,       forKey: "latitude")
+        setValue(longitude,      forKey: "longitude")
+        setValue(countryCode,    forKey: "countryCode")
+        setValue(isp,            forKey: "isp")
+        setValue(ikev2,          forKey: "ikev2")
+        setValue(certificateURL, forKey: "certificateURL")
     }
 
 	/**
@@ -44,6 +80,33 @@ class VPN : NSManagedObject{
 		if let titleValue = dictionary["title"] as? String{
 			title = titleValue
 		}
+        if let alwaysOnValue = dictionary["alwaysOn"] as? NSNumber {
+            alwaysOn = alwaysOnValue.boolValue
+        }
+        if let enabledValue = dictionary["enabled"] as? NSNumber {
+            enabled = enabledValue.boolValue
+        }
+        if let latencyValue = dictionary["latency"] as? NSNumber {
+            latency = Int16(latencyValue.intValue)
+        }
+        if let latitudeValue = dictionary["latitude"] as? NSNumber {
+            latitude = latitudeValue.floatValue
+        }
+        if let longitudeValue = dictionary["longitude"] as? NSNumber {
+            longitude = longitudeValue.floatValue
+        }
+        if let countryCodeValue = dictionary["countryCode"] as? String {
+            countryCode = countryCodeValue
+        }
+        if let ispValue = dictionary["isp"] as? String {
+            isp = ispValue
+        }
+        if let ikev2Value = dictionary["ikev2"] as? NSNumber {
+            ikev2 = ikev2Value.boolValue
+        }
+        if let certificateURLValue = dictionary["certificateURL"] as? String{
+            certificateURL = certificateURLValue
+        }
 	}
 
 	/**
@@ -53,24 +116,33 @@ class VPN : NSManagedObject{
 	{
 		var dictionary = NSMutableDictionary()
         dictionary["ID"] = ID
-		if account != nil{
+		if account != nil {
 			dictionary["account"] = account
 		}
-		if group != nil{
-			dictionary["group"] = group
+		if group != nil {
+			dictionary["group"]  = group
 		}
-		if server != nil{
+		if server != nil {
 			dictionary["server"] = server
 		}
-		if title != nil{
-			dictionary["title"] = title
+		if title != nil {
+			dictionary["title"]  = title
 		}
+        dictionary["alwaysOn"]   = NSNumber(bool: alwaysOn)
+        dictionary["enabled"]    = NSNumber(bool: enabled)
+        dictionary["latency"]    = NSNumber(short: Int16(latency))
+        dictionary["latitude"]   = NSNumber(float: latitude)
+        dictionary["longitude"]  = NSNumber(float: longitude)
+        dictionary["ikev2"]      = NSNumber(bool: ikev2)
+        if countryCode != nil {
+            dictionary["countryCode"] = countryCode
+        }
+        if isp != nil {
+            dictionary["isp"] = isp
+        }
+        if certificateURL != nil {
+            dictionary["certificateURL"]  = certificateURL
+        }
 		return dictionary
 	}
-    
-    func destroy() {
-        VPNManager.sharedManager().removeProfile()
-        
-        self.managedObjectContext!.deleteObject(self)
-    }
 }

@@ -11,34 +11,73 @@ import Foundation
 //let kKeychainServiceName = NSBundle.mainBundle().bundleIdentifier!
 let kKeychainServiceName = "com.LexTang.VPNOn"
 
-@objc(VPNKeychainWrapper)
-class VPNKeychainWrapper
+final public class VPNKeychainWrapper
 {
-    class func setPassword(password: String, forVPNID VPNID: String) -> Bool {
+    public class func setPassword(password: String, forVPNID VPNID: String) -> Bool {
+        let key = NSURL(string: VPNID)!.lastPathComponent!
         KeychainWrapper.serviceName = kKeychainServiceName
-        KeychainWrapper.removeObjectForKey(VPNID)
-        return KeychainWrapper.setString(password, forKey: VPNID)
+        KeychainWrapper.removeObjectForKey(key)
+        if password.isEmpty {
+            return true
+        }
+        return KeychainWrapper.setString(password, forKey: key)
     }
     
-    class func setSecret(secret: String, forVPNID VPNID: String) -> Bool {
+    public class func setSecret(secret: String, forVPNID VPNID: String) -> Bool {
+        let key = NSURL(string: VPNID)!.lastPathComponent!
         KeychainWrapper.serviceName = kKeychainServiceName
-        KeychainWrapper.removeObjectForKey("\(VPNID)psk")
-        return KeychainWrapper.setString(secret, forKey: "\(VPNID)psk")
+        KeychainWrapper.removeObjectForKey("\(key)psk")
+        if secret.isEmpty {
+            return true
+        }
+        return KeychainWrapper.setString(secret, forKey: "\(key)psk")
     }
     
-    class func passwordForVPNID(VPNID: String) -> NSData? {
+    public class func setCertificate(certificate: NSData?, forVPNID VPNID: String) -> Bool {
+        let key = NSURL(string: VPNID)!.lastPathComponent!
         KeychainWrapper.serviceName = kKeychainServiceName
-        return KeychainWrapper.dataForKey(VPNID)
+        KeychainWrapper.removeObjectForKey("\(key)cert")
+        if let data = certificate {
+            KeychainWrapper.setData(data, forKey: "\(key)cert")
+        }
+        return true
     }
     
-    class func secretForVPNID(VPNID: String) -> NSData? {
+    public class func passwordForVPNID(VPNID: String) -> NSData? {
+        let key = NSURL(string: VPNID)!.lastPathComponent!
         KeychainWrapper.serviceName = kKeychainServiceName
-        return KeychainWrapper.dataForKey("\(VPNID)psk")
+        return KeychainWrapper.dataRefForKey(key)
     }
     
-    class func destoryKeyForVPNID(VPNID: String) {
+    public class func secretForVPNID(VPNID: String) -> NSData? {
+        let key = NSURL(string: VPNID)!.lastPathComponent!
         KeychainWrapper.serviceName = kKeychainServiceName
-        KeychainWrapper.removeObjectForKey(VPNID)
-        KeychainWrapper.removeObjectForKey("\(VPNID)psk")
+        return KeychainWrapper.dataRefForKey("\(key)psk")
+    }
+    
+    public class func destoryKeyForVPNID(VPNID: String) {
+        let key = NSURL(string: VPNID)!.lastPathComponent!
+        KeychainWrapper.serviceName = kKeychainServiceName
+        KeychainWrapper.removeObjectForKey(key)
+        KeychainWrapper.removeObjectForKey("\(key)psk")
+        KeychainWrapper.removeObjectForKey("\(key)cert")
+    }
+    
+    public class func passwordStringForVPNID(VPNID: String) -> String? {
+        let key = NSURL(string: VPNID)!.lastPathComponent!
+        KeychainWrapper.serviceName = kKeychainServiceName
+        return KeychainWrapper.stringForKey(key)
+    }
+    
+    public class func secretStringForVPNID(VPNID: String) -> String? {
+        let key = NSURL(string: VPNID)!.lastPathComponent!
+        KeychainWrapper.serviceName = kKeychainServiceName
+        return KeychainWrapper.stringForKey("\(key)psk")
+    }
+    
+    public class func certificateForVPNID(VPNID: String) -> NSData? {
+        let key = NSURL(string: VPNID)!.lastPathComponent!
+        KeychainWrapper.serviceName = kKeychainServiceName
+        return KeychainWrapper.dataForKey("\(key)cert")
     }
 }

@@ -10,129 +10,202 @@ import Foundation
 import NetworkExtension
 import CoreData
 
-let kAppGroupName = "group.VPNOn"
-let kActivatedVPNKey = "activatedVPN"
+let kAppGroupIdentifier = "group.VPNOn"
 
-@objc(VPNManager)
-class VPNManager
+final public class VPNManager
 {
-    let _manager = NEVPNManager.sharedManager()!
+    lazy var _manager: NEVPNManager = {
+        return NEVPNManager.sharedManager()!
+        }()
     
-    var status: NEVPNStatus {
+    lazy var _defaults: NSUserDefaults = {
+        return NSUserDefaults(suiteName: kAppGroupIdentifier)!
+        }()
+    
+    public var status: NEVPNStatus {
         get {
             return _manager.connection.status
         }
     }
     
-    class var _sharedManager : VPNManager
+    private let kVPNOnDisplayFlags = "displayFlags"
+    
+    public var displayFlags: Bool {
+        get {
+            if let value = _defaults.objectForKey(kVPNOnDisplayFlags) as Int? {
+                return Bool(value)
+            }
+            return true
+        }
+        set {
+            _defaults.setObject(Int(newValue), forKey: kVPNOnDisplayFlags)
+            _defaults.synchronize()
+        }
+    }
+    
+    public class var sharedManager : VPNManager
     {
         struct Static
         {
-            static var onceToken : dispatch_once_t = 0
-            static var instance : VPNManager? = nil
-        }
-        
-        dispatch_once(&Static.onceToken)
-            {
-                Static.instance = VPNManager()
-                Static.instance!._manager.loadFromPreferencesWithCompletionHandler {
+            static let sharedInstance : VPNManager = {
+                let instance = VPNManager()
+                instance._manager.loadFromPreferencesWithCompletionHandler {
                     (error: NSError!) -> Void in
                     if let err = error {
                         println("Failed to load preferences: \(err.localizedDescription)")
                     }
                 }
-                Static.instance!._manager.localizedDescription = "VPN On"
-                Static.instance!._manager.enabled = true
+                instance._manager.localizedDescription = "VPN On"
+                instance._manager.enabled = true
+                return instance
+            }()
         }
         
-        return Static.instance!
+        return Static.sharedInstance
     }
     
-    class func sharedManager() -> VPNManager {
-        return VPNManager._sharedManager
-    }
-    
-    var activatedVPNDict: NSDictionary? {
-        get {
-            if let defaults = NSUserDefaults(suiteName: kAppGroupName) {
-                if let VPNDict = defaults.objectForKey(kActivatedVPNKey) as NSDictionary? {
-                    return VPNDict
-                }
-            }
-            return .None
-        }
-        set {
-            if let defaults = NSUserDefaults(suiteName: kAppGroupName) {
-                defaults.setObject(newValue, forKey: kActivatedVPNKey)
-                defaults.synchronize()
-            }
-        }
-    }
-    
-    func connect() {
-        if let VPNDict = activatedVPNDict {
-            var p = NEVPNProtocolIPSec()
-            p.authenticationMethod = NEVPNIKEAuthenticationMethod.SharedSecret
-            
-            if let group = VPNDict.objectForKey("group") as String? {
-                p.localIdentifier = group
-            } else {
-                p.localIdentifier = "VPN"
-            }
-            
-            if let title = VPNDict.objectForKey("title") as String? {
-                _manager.localizedDescription = "VPN On - \(title)"
-            }
-            
-            if let username = VPNDict.objectForKey("account") as String? {
-                p.username = username
-            }
-            
-            if let server = VPNDict.objectForKey("server") as String? {
-                p.serverAddress = server
-                p.remoteIdentifier = server
-            }
-            
-            p.useExtendedAuthentication = true
-            p.disconnectOnSleep = false
-            
-            let VPNID = VPNDict.objectForKey("ID") as String
-            
-            if let passwordRef = VPNKeychainWrapper.passwordForVPNID(VPNID) {
-                p.passwordReference = passwordRef
-            }
-            
-            if let secretRef = VPNKeychainWrapper.secretForVPNID(VPNID) {
-                p.sharedSecretReference = secretRef
-            }
-            
-            _manager.enabled = true
-            _manager.`protocol` = p
-            _manager.saveToPreferencesWithCompletionHandler {
-                (error: NSError!) -> Void in
-                if let err = error {
-                    println("Failed to save profile: \(err.localizedDescription)")
-                } else {
-                    var connectError : NSError?
-                    self._manager.connection.startVPNTunnelAndReturnError(&connectError)
-                    
-                    if let connectErr = connectError {
-                        println("Failed to start tunnel: \(connectErr.localizedDescription)")
-                    } else {
-                        println("VPN tunnel started.")
-                    }
-                }
-            }
+    public func connectIPSec(title: String, server: String, account: String?, group: String?, alwaysOn: Bool = true, passwordRef: NSData?, secretRef: NSData?, certificate: NSData?) {
+
+        let p = NEVPNProtocolIPSec()
+
+        p.authenticationMethod = NEVPNIKEAuthenticationMethod.None
+        p.useExtendedAuthentication = true
+        p.serverAddress = server
+        p.disconnectOnSleep = !alwaysOn
+        
+        _manager.localizedDescription = "VPN On - \(title)"
+        
+        if let grp = group {
+            p.localIdentifier = grp
         } else {
-            println("Please activate a VPN.")
+            p.localIdentifier = "VPN"
+        }
+
+        if let username = account {
+            p.username = username
+        }
+        
+        if let password = passwordRef {
+            p.passwordReference = password
+        }
+        
+        if let secret = secretRef {
+            p.authenticationMethod = NEVPNIKEAuthenticationMethod.SharedSecret
+            p.sharedSecretReference = secret
+        }
+        
+        if let certficiateData = certificate {
+            p.authenticationMethod = NEVPNIKEAuthenticationMethod.Certificate
+            p.identityData = certficiateData
+        }
+    
+        _manager.enabled = true
+        _manager.`protocol` = p
+        
+        configOnDemand()
+        
+        _manager.saveToPreferencesWithCompletionHandler {
+            (error: NSError!) -> Void in
+            if let err = error {
+                println("Failed to save profile: \(err.localizedDescription)")
+            } else {
+                var connectError : NSError?
+                self._manager.connection.startVPNTunnelAndReturnError(&connectError)
+                
+                if let connectErr = connectError {
+//                    println("Failed to start tunnel: \(connectErr.localizedDescription)")
+                } else {
+//                    println("VPN tunnel started.")
+                }
+            }
         }
     }
     
-    func disconnect() {
+    public func connectIKEv2(title: String, server: String, account: String?, group: String?, alwaysOn: Bool = true, passwordRef: NSData?, secretRef: NSData?, certificate: NSData?) {
+        
+        let p = NEVPNProtocolIKEv2()
+        
+        p.authenticationMethod = NEVPNIKEAuthenticationMethod.None
+        p.useExtendedAuthentication = true
+        p.serverAddress = server
+        p.remoteIdentifier = server
+        p.disconnectOnSleep = !alwaysOn
+        p.deadPeerDetectionRate = NEVPNIKEv2DeadPeerDetectionRate.Medium
+        // TODO: Add an option into config page
+        
+        _manager.localizedDescription = "VPN On - \(title)"
+        
+        if let grp = group {
+            p.localIdentifier = grp
+        } else {
+            p.localIdentifier = "VPN"
+        }
+        
+        if let username = account {
+            p.username = username
+        }
+        
+        if let password = passwordRef {
+            p.passwordReference = password
+        }
+        
+        if let secret = secretRef {
+            p.authenticationMethod = NEVPNIKEAuthenticationMethod.SharedSecret
+            p.sharedSecretReference = secret
+        }
+        
+        if let certficiateData = certificate {
+            p.authenticationMethod = NEVPNIKEAuthenticationMethod.Certificate
+            p.serverCertificateCommonName = server
+            p.serverCertificateIssuerCommonName = server
+            p.identityData = certficiateData
+        }
+        
+        _manager.enabled = true
+        _manager.`protocol` = p
+        
+        configOnDemand()
+        
+        _manager.saveToPreferencesWithCompletionHandler {
+            (error: NSError!) -> Void in
+            if let err = error {
+                println("Failed to save profile: \(err.localizedDescription)")
+            } else {
+                var connectError : NSError?
+                if self._manager.connection.startVPNTunnelAndReturnError(&connectError) {
+                    if let connectErr = connectError {
+                        println("Failed to start IKEv2 tunnel: \(connectErr.localizedDescription)")
+                    } else {
+                        println("IKEv2 tunnel started.")
+                    }
+                } else {
+                    println("Failed to connect: \(connectError?.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    public func configOnDemand() {
+        if onDemandDomainsArray.count > 0 && onDemand {
+            let connectionRule = NEEvaluateConnectionRule(
+                matchDomains: onDemandDomainsArray,
+                andAction: NEEvaluateConnectionRuleAction.ConnectIfNeeded
+            )
+            let ruleEvaluateConnection = NEOnDemandRuleEvaluateConnection()
+            ruleEvaluateConnection.connectionRules = [connectionRule]
+            _manager.onDemandRules = [ruleEvaluateConnection]
+            _manager.onDemandEnabled = true
+        } else {
+            _manager.onDemandRules = [AnyObject]()
+            _manager.onDemandEnabled = false
+        }
+    }
+    
+    public func disconnect() {
         _manager.connection.stopVPNTunnel()
     }
     
-    func removeProfile() {
+    public func removeProfile() {
         _manager.removeFromPreferencesWithCompletionHandler {
             (error: NSError!) -> Void in
             

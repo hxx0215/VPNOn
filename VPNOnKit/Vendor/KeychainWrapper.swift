@@ -18,8 +18,9 @@ let SecAttrGeneric: String! = kSecAttrGeneric as String
 let SecAttrAccount: String! = kSecAttrAccount as String
 let SecReturnPersistentRef: String! = kSecReturnPersistentRef as String
 
-class KeychainWrapper {
-   private struct internalVars {
+@objc(KeychainWrapper)
+final public class KeychainWrapper {
+    private struct internalVars {
         static var serviceName: String = ""
     }
     
@@ -30,7 +31,7 @@ class KeychainWrapper {
     @abstract Used for the kSecAttrService property to uniquely identify this keychain accessor.
     @discussion Service Name will default to the app's bundle identifier if it can
     */
-    class var serviceName: String {
+    public class var serviceName: String {
         get {
             if internalVars.serviceName.isEmpty {
                 internalVars.serviceName = NSBundle.mainBundle().bundleIdentifier ?? "SwiftKeychainWrapper"
@@ -43,7 +44,7 @@ class KeychainWrapper {
     }
     
     // MARK: Public Methods
-    class func hasValueForKey(key: String) -> Bool {
+    public class func hasValueForKey(key: String) -> Bool {
         var keychainData: NSData? = self.dataForKey(key)
         if let data = keychainData {
             return true
@@ -53,7 +54,7 @@ class KeychainWrapper {
     }
     
     // MARK: Getting Values
-    class func stringForKey(keyName: String) -> String? {
+    public class func stringForKey(keyName: String) -> String? {
         var keychainData: NSData? = self.dataForKey(keyName)
         var stringValue: String?
         if let data = keychainData {
@@ -63,7 +64,7 @@ class KeychainWrapper {
         return stringValue
     }
     
-    class func objectForKey(keyName: String) -> NSCoding? {
+    public class func objectForKey(keyName: String) -> NSCoding? {
         let dataValue: NSData? = self.dataForKey(keyName)
         
         var objectValue: NSCoding?
@@ -75,14 +76,35 @@ class KeychainWrapper {
         return objectValue;
     }
     
-    class func dataForKey(keyName: String) -> NSData? {
+    public class func dataForKey(keyName: String) -> NSData? {
         var keychainQueryDictionary = self.setupKeychainQueryDictionaryForKey(keyName)
         
         // Limit search results to one
         keychainQueryDictionary[SecMatchLimit] = kSecMatchLimitOne
         
         // Specify we want NSData/CFData returned
-//        keychainQueryDictionary[SecReturnData] = kCFBooleanTrue
+        keychainQueryDictionary[SecReturnData] = kCFBooleanTrue
+        
+        // Search
+        var searchResultRef: Unmanaged<AnyObject>?
+        var keychainValue: NSData?
+        
+        let status: OSStatus = SecItemCopyMatching(keychainQueryDictionary, &searchResultRef)
+        
+        if status == noErr {
+            if let resultRef = searchResultRef {
+                keychainValue = resultRef.takeUnretainedValue() as? NSData
+            }
+        }
+        
+        return keychainValue;
+    }
+    
+    public class func dataRefForKey(keyName: String) -> NSData? {
+        var keychainQueryDictionary = self.setupKeychainQueryDictionaryForKey(keyName)
+        
+        // Limit search results to one
+        keychainQueryDictionary[SecMatchLimit] = kSecMatchLimitOne
         
         keychainQueryDictionary[SecReturnPersistentRef] = kCFBooleanTrue
         
@@ -102,7 +124,7 @@ class KeychainWrapper {
     }
     
     // MARK: Setting Values
-    class func setString(value: String, forKey keyName: String) -> Bool {
+    public class func setString(value: String, forKey keyName: String) -> Bool {
         if let data = value.dataUsingEncoding(NSUTF8StringEncoding) {
             return self.setData(data, forKey: keyName)
         } else {
@@ -110,13 +132,13 @@ class KeychainWrapper {
         }
     }
     
-    class func setObject(value: NSCoding, forKey keyName: String) -> Bool {
+    public class func setObject(value: NSCoding, forKey keyName: String) -> Bool {
         let data = NSKeyedArchiver.archivedDataWithRootObject(value)
         
         return self.setData(data, forKey: keyName)
     }
     
-    class func setData(value: NSData, forKey keyName: String) -> Bool {
+    public class func setData(value: NSData, forKey keyName: String) -> Bool {
         var keychainQueryDictionary: NSMutableDictionary = self.setupKeychainQueryDictionaryForKey(keyName)
         
         keychainQueryDictionary[SecValueData] = value
@@ -135,7 +157,7 @@ class KeychainWrapper {
     }
     
     // MARK: Removing Values
-    class func removeObjectForKey(keyName: String) -> Bool {
+    public class func removeObjectForKey(keyName: String) -> Bool {
         let keychainQueryDictionary: NSMutableDictionary = self.setupKeychainQueryDictionaryForKey(keyName)
         
         // Delete
@@ -174,8 +196,6 @@ class KeychainWrapper {
         var encodedIdentifier: NSData? = keyName.dataUsingEncoding(NSUTF8StringEncoding)
         
         keychainQueryDictionary[SecAttrGeneric] = encodedIdentifier
-        
-        keychainQueryDictionary[SecReturnPersistentRef] = kCFBooleanTrue
         
         keychainQueryDictionary[SecAttrAccount] = encodedIdentifier
         

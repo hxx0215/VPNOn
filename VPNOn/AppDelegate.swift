@@ -14,12 +14,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
     var window: UIWindow?
 
-
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         let splitViewController = self.window!.rootViewController as UISplitViewController
         splitViewController.delegate = self
         splitViewController.preferredDisplayMode = .AllVisible
+        
+        LTThemeManager.sharedManager.activateTheme()
+        
         return true
     }
 
@@ -44,6 +46,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
+    }
+    
+    // MARK: - URL scheme
+    
+    func application(application: UIApplication, handleOpenURL url: NSURL) -> Bool {
+        if let info = VPN.parseURL(url) {
+            let splitVC = window!.rootViewController as UISplitViewController
+            
+            let detailNC = splitVC.viewControllers.last! as UINavigationController
+            detailNC.popToRootViewControllerAnimated(false)
+            
+            let createVC = splitVC.storyboard!.instantiateViewControllerWithIdentifier(
+                NSStringFromClass(LTVPNConfigViewController)
+                ) as LTVPNConfigViewController
+            createVC.initializedVPNInfo = info
+            
+            detailNC.pushViewController(createVC, animated: false)
+        }
+        
+        return true
     }
     
     // MARK: - Split view

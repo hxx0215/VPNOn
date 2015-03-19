@@ -30,10 +30,39 @@ class VPNOnKitTests: XCTestCase {
             VPNKeychainWrapper.setSecret("world", forVPNID: "testVPN")
             XCTAssertNotNil(VPNKeychainWrapper.secretForVPNID("testVPN"), "Secret data in keychain must not be nil.")
             
+            let passwordString = VPNKeychainWrapper.passwordStringForVPNID("testVPN")
+            XCTAssert(passwordString == "hello", "Password string must match the previous one.")
+            
             VPNKeychainWrapper.destoryKeyForVPNID("testVPN")
             XCTAssertNil(VPNKeychainWrapper.passwordForVPNID("testVPN"), "Password data must be empty after destory.")
             XCTAssertNil(VPNKeychainWrapper.secretForVPNID("testVPN"), "Secret data must be empty after destory.")
         }
     }
     
+    func testGeoIP() {
+        let geoInfoOfGoogleDNS = VPNManager.sharedManager.geoInfoOfIP("8.8.4.4")
+        XCTAssert(geoInfoOfGoogleDNS != nil, "Google DNS must has Geo IP info.")
+        XCTAssert(geoInfoOfGoogleDNS!.isp == "Google Inc.", "Google DNS must be hosted by Google Inc.")
+    }
+    
+    func testResolve() {
+        let ipOfPingAn = VPNManager.sharedManager.IPOfHost("pingan.com")
+        XCTAssert(ipOfPingAn != nil, "IP must not be nil.")
+        XCTAssert(ipOfPingAn! == "202.69.26.11", "IP of PingAn must not be changed for years.")
+        let ipOfGoogleDNS = VPNManager.sharedManager.IPOfHost("8.8.4.4")
+        XCTAssert(ipOfGoogleDNS! == "8.8.4.4", "IP of Google DNS must be valid.")
+    }
+    
+    func testAsyncResolve() {
+        var expectation = self.expectationWithDescription("Async fetch GeoInfo.")
+        
+        VPNManager.sharedManager.geoInfoOfHost("google.com") {
+            geoInfo in
+            
+            XCTAssert(geoInfo.countryCode != "", "Country code must not be empty.")
+            expectation.fulfill()
+        }
+        
+        self.waitForExpectationsWithTimeout(3.0, handler: nil)
+    }
 }
