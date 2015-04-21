@@ -9,7 +9,7 @@
 import Foundation
 
 //let kKeychainServiceName = NSBundle.mainBundle().bundleIdentifier!
-let kKeychainServiceName = "com.LexTang.VPNOn"
+let kKeychainServiceName = "com.hxx.VPNOn"
 
 final public class VPNKeychainWrapper
 {

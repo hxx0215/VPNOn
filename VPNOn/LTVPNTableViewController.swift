@@ -25,7 +25,7 @@ let kDomainsCellID = "DomainsCell"
 class LTVPNTableViewController: UITableViewController, SimplePingDelegate, LTVPNDomainsViewControllerDelegate
 {
     var vpns = [VPN]()
-    var activatedVPNID: NSString? = nil
+    var activatedVPNID: String? = nil
     var connectionStatus = NSLocalizedString("Not Connected", comment: "VPN Table - Connection Status")
     var connectionOn = false
 
@@ -51,6 +51,8 @@ class LTVPNTableViewController: UITableViewController, SimplePingDelegate, LTVPN
 
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("geoDidUpdate:"), name: "kLTGeoDidUpdate", object: nil)
 
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("selectionDidChange:"), name: "kLTSelectionDidChange", object: nil)
+        
         NSNotificationCenter.defaultCenter().addObserver(
             self,
             selector: Selector("VPNStatusDidChange:"),
@@ -69,6 +71,8 @@ class LTVPNTableViewController: UITableViewController, SimplePingDelegate, LTVPN
 
         NSNotificationCenter.defaultCenter().removeObserver(self, name: "kLTGeoDidUpdate", object: nil)
 
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: "kLTSelectionDidChange", object: nil)
+        
         NSNotificationCenter.defaultCenter().removeObserver(
             self,
             name: NEVPNStatusDidChangeNotification,
@@ -85,6 +89,19 @@ class LTVPNTableViewController: UITableViewController, SimplePingDelegate, LTVPN
         }
 
         tableView.reloadData()
+        
+        reloadVPNs()
+    }
+    
+    func reloadVPNs() {
+        vpns = VPNDataManager.sharedManager.allVPN()
+        
+        if let selectedID = VPNDataManager.sharedManager.selectedVPNID {
+            if selectedID != activatedVPNID {
+                activatedVPNID = selectedID.URIRepresentation().absoluteString
+                tableView.reloadData()
+            }
+        }
     }
 
     // MARK: - Table view data source
@@ -114,7 +131,7 @@ class LTVPNTableViewController: UITableViewController, SimplePingDelegate, LTVPN
         switch indexPath.section
         {
         case kVPNConnectionSection:
-            let cell = tableView.dequeueReusableCellWithIdentifier(kConnectionCellID, forIndexPath: indexPath) as LTVPNSwitchCell
+            let cell = tableView.dequeueReusableCellWithIdentifier(kConnectionCellID, forIndexPath: indexPath) as! LTVPNSwitchCell
             cell.titleLabel!.text = connectionStatus
             cell.switchButton.on = connectionOn
             cell.switchButton.enabled = vpns.count != 0
@@ -123,11 +140,11 @@ class LTVPNTableViewController: UITableViewController, SimplePingDelegate, LTVPN
 
         case kVPNOnDemandSection:
             if indexPath.row == 0 {
-                let switchCell = tableView.dequeueReusableCellWithIdentifier(kOnDemandCellID) as LTVPNSwitchCell
+                let switchCell = tableView.dequeueReusableCellWithIdentifier(kOnDemandCellID) as! LTVPNSwitchCell
                 switchCell.switchButton.on = VPNManager.sharedManager.onDemand
                 return switchCell
             } else {
-                let domainsCell = tableView.dequeueReusableCellWithIdentifier(kDomainsCellID) as LTVPNTableViewCell
+                let domainsCell = tableView.dequeueReusableCellWithIdentifier(kDomainsCellID) as! LTVPNTableViewCell
                 var domainsCount = 0
                 for domain in VPNManager.sharedManager.onDemandDomainsArray as [String] {
                     if domain.rangeOfString("*.") == nil {
@@ -135,12 +152,12 @@ class LTVPNTableViewController: UITableViewController, SimplePingDelegate, LTVPN
                     }
                 }
                 let domainsCountFormat = NSLocalizedString("%d Domains", comment: "VPN Table - Domains count")
-                domainsCell.detailTextLabel!.text = NSString(format: domainsCountFormat, domainsCount)
+                domainsCell.detailTextLabel!.text = String(format: domainsCountFormat, domainsCount)
                 return domainsCell
             }
 
         case kVPNListSectionIndex:
-            let cell = tableView.dequeueReusableCellWithIdentifier(kVPNCellID, forIndexPath: indexPath) as LTVPNTableViewCell
+            let cell = tableView.dequeueReusableCellWithIdentifier(kVPNCellID, forIndexPath: indexPath) as! LTVPNTableViewCell
             let vpn = vpns[indexPath.row]
             cell.textLabel?.attributedText = cellTitleForIndexPath(indexPath)
             cell.detailTextLabel?.text = vpn.server
@@ -160,7 +177,7 @@ class LTVPNTableViewController: UITableViewController, SimplePingDelegate, LTVPN
             return cell
 
         default:
-            return tableView.dequeueReusableCellWithIdentifier(kAddCellID, forIndexPath: indexPath) as UITableViewCell
+            return tableView.dequeueReusableCellWithIdentifier(kAddCellID, forIndexPath: indexPath) as! UITableViewCell
         }
     }
 
@@ -169,14 +186,14 @@ class LTVPNTableViewController: UITableViewController, SimplePingDelegate, LTVPN
         {
         case kVPNAddSection:
             VPNDataManager.sharedManager.selectedVPNID = nil
-            let detailNavigationController = splitViewController!.viewControllers.last! as UINavigationController
+            let detailNavigationController = splitViewController!.viewControllers.last! as! UINavigationController
             detailNavigationController.popToRootViewControllerAnimated(false)
             splitViewController!.viewControllers.last!.performSegueWithIdentifier("config", sender: nil)
             break
 
         case kVPNOnDemandSection:
             if indexPath.row == 1 {
-                let detailNavigationController = splitViewController!.viewControllers.last! as UINavigationController
+                let detailNavigationController = splitViewController!.viewControllers.last! as! UINavigationController
                 detailNavigationController.popToRootViewControllerAnimated(false)
                 splitViewController!.viewControllers.last!.performSegueWithIdentifier("domains", sender: nil)
             }
@@ -224,16 +241,22 @@ class LTVPNTableViewController: UITableViewController, SimplePingDelegate, LTVPN
     func reloadDataAndPopDetail(notification: NSNotification) {
         vpns = VPNDataManager.sharedManager.allVPN()
         tableView.reloadData()
-        if let vpn = notification.object as VPN? {
+        if let vpn = notification.object as! VPN? {
             NSNotificationCenter.defaultCenter().postNotificationName("kLTGeoDidUpdate", object: vpn)
         }
         popDetailViewController()
+        
+        VPNManager.sharedManager.seeYaInAnothaLifeBrotha()
+    }
+    
+    func selectionDidChange(notification: NSNotification) {
+        reloadVPNs()
     }
 
     // MARK: - Navigation
 
     func popDetailViewController() {
-        let topNavigationController = splitViewController!.viewControllers.last! as UINavigationController
+        let topNavigationController = splitViewController!.viewControllers.last! as! UINavigationController
         topNavigationController.popViewControllerAnimated(true)
     }
 
@@ -242,7 +265,8 @@ class LTVPNTableViewController: UITableViewController, SimplePingDelegate, LTVPN
             let VPNID = vpns[indexPath.row].objectID
             VPNDataManager.sharedManager.selectedVPNID = VPNID
 
-            let detailNavigationController = splitViewController!.viewControllers.last! as UINavigationController
+            
+            let detailNavigationController = splitViewController!.viewControllers.last! as! UINavigationController
             detailNavigationController.popToRootViewControllerAnimated(false)
             detailNavigationController.performSegueWithIdentifier("config", sender: self)
         }

@@ -39,6 +39,13 @@ class VPNOnKitTests: XCTestCase {
         }
     }
     
+    func testDomainsInString() {
+        let mustBe2 = VPNManager.sharedManager.domainsInString("a")
+        XCTAssert(mustBe2.count == 2, "Must be 2 domains.")
+        let mustBe4 = VPNManager.sharedManager.domainsInString("a b")
+        XCTAssert(mustBe4.count == 4, "Must be 4 domains.")
+    }
+    
     func testGeoIP() {
         let geoInfoOfGoogleDNS = VPNManager.sharedManager.geoInfoOfIP("8.8.4.4")
         XCTAssert(geoInfoOfGoogleDNS != nil, "Google DNS must has Geo IP info.")
@@ -51,6 +58,16 @@ class VPNOnKitTests: XCTestCase {
         XCTAssert(ipOfPingAn! == "202.69.26.11", "IP of PingAn must not be changed for years.")
         let ipOfGoogleDNS = VPNManager.sharedManager.IPOfHost("8.8.4.4")
         XCTAssert(ipOfGoogleDNS! == "8.8.4.4", "IP of Google DNS must be valid.")
+    }
+    
+    func testInvalidDomain() {
+        let ipOfInvalidDomain = VPNManager.sharedManager.IPOfHost("q")
+        XCTAssertNil(ipOfInvalidDomain, "This domain must be invalid.")
+    }
+    
+    func testEmptyDomain() {
+        let ipOfEmptyDomain = VPNManager.sharedManager.IPOfHost("")
+        XCTAssertNil(ipOfEmptyDomain, "No domain must be invalid.")
     }
     
     func testAsyncResolve() {

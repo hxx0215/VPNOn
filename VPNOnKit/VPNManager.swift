@@ -22,6 +22,10 @@ final public class VPNManager
         return NSUserDefaults(suiteName: kAppGroupIdentifier)!
         }()
     
+    public lazy var wormhole: MMWormhole = {
+        return MMWormhole(applicationGroupIdentifier: kAppGroupIdentifier, optionalDirectory: "wormhole")
+        }()
+    
     public var status: NEVPNStatus {
         get {
             return _manager.connection.status
@@ -32,7 +36,7 @@ final public class VPNManager
     
     public var displayFlags: Bool {
         get {
-            if let value = _defaults.objectForKey(kVPNOnDisplayFlags) as Int? {
+            if let value = _defaults.objectForKey(kVPNOnDisplayFlags) as! Int? {
                 return Bool(value)
             }
             return true
