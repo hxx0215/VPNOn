@@ -8,11 +8,11 @@
 	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.VPNOn</string>
+		<string>group.hxx.vpnOn</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)com.LexTang.VPNOn</string>
+		<string>$(AppIdentifierPrefix)com.hxx.VPNOn</string>
 	</array>
 </dict>
 </plist>

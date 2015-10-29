@@ -10,12 +10,12 @@ import Foundation
 import NetworkExtension
 import CoreData
 
-let kAppGroupIdentifier = "group.VPNOn"
+let kAppGroupIdentifier = "group.hxx.VPNOn"
 
 final public class VPNManager
 {
     lazy var manager: NEVPNManager = {
-        return NEVPNManager.sharedManager()!
+        return NEVPNManager.sharedManager()
         }()
     
     lazy var defaults: NSUserDefaults = {
@@ -54,9 +54,9 @@ final public class VPNManager
             static let sharedInstance : VPNManager = {
                 let instance = VPNManager()
                 instance.manager.loadFromPreferencesWithCompletionHandler {
-                    (error: NSError!) -> Void in
+                    (error) -> Void in
                     if let err = error {
-                        debugPrintln("Failed to load preferences: \(err.localizedDescription)")
+//                        debugPrintln("Failed to load preferences: \(err.localizedDescription)")
                     }
                 }
                 instance.manager.localizedDescription = "VPN On"
@@ -112,16 +112,16 @@ final public class VPNManager
         println("I'm afraid you can not connect VPN in simulators.")
 #else
         manager.saveToPreferencesWithCompletionHandler {
-            (error: NSError!) -> Void in
-            if let err = error {
-                debugPrintln("Failed to save profile: \(err.localizedDescription)")
+            (error) -> Void in
+            if let _ = error {
+//                debugPrintln("Failed to save profile: \(err.localizedDescription)")
             } else {
-                var connectError : NSError?
-                self.manager.connection.startVPNTunnelAndReturnError(&connectError)
+//                self.manager.connection.startVPNTunnelAndReturnError(&connectError)
+                    _ = try! self.manager.connection.startVPNTunnel()
                 
-                if let connectErr = connectError {
-                    debugPrintln("Failed to start tunnel: \(connectErr.localizedDescription)")
-                }
+//                if let connectErr = connectError {
+//                    debugPrintln("Failed to start tunnel: \(connectErr.localizedDescription)")
+//                }
             }
         }
 #endif
@@ -173,16 +173,17 @@ final public class VPNManager
         configOnDemand()
         
         manager.saveToPreferencesWithCompletionHandler {
-            (error: NSError!) -> Void in
+            (error ) -> Void in
             if let err = error {
-                debugPrintln("Failed to save profile: \(err.localizedDescription)")
+//                debugPrintln("Failed to save profile: \(err.localizedDescription)")
             } else {
-                var connectError : NSError?
-                if !self.manager.connection.startVPNTunnelAndReturnError(&connectError) {
-                    if let connectErr = connectError {
-                        debugPrintln("Failed to start IKEv2 tunnel: \(connectErr.localizedDescription)")
-                    }
-                }
+                try! self.manager.connection.startVPNTunnel()
+//                var connectError : NSError?
+//                if !self.manager.connection.startVPNTunnelAndReturnError(&connectError) {
+//                    if let connectErr = connectError {
+//                        debugPrintln("Failed to start IKEv2 tunnel: \(connectErr.localizedDescription)")
+//                    }
+//                }
             }
         }
     }
@@ -198,7 +199,7 @@ final public class VPNManager
             manager.onDemandRules = [ruleEvaluateConnection]
             manager.onDemandEnabled = true
         } else {
-            manager.onDemandRules = [AnyObject]()
+            manager.onDemandRules = [NEOnDemandRule]()
             manager.onDemandEnabled = false
         }
     }
@@ -209,7 +210,7 @@ final public class VPNManager
     
     public func removeProfile() {
         manager.removeFromPreferencesWithCompletionHandler {
-            (error: NSError!) -> Void in
+            (error) -> Void in
             
         }
     }

@@ -89,7 +89,7 @@ class VPNCertificateViewController: UITableViewController, UITextFieldDelegate
                 vpnObject.certificateURL = certificateURLField.text
                 VPNDataManager.sharedManager.saveContext()
             } else if let d = delegate {
-                d.didTapSaveCertificateWithData?(data, URLString: certificateURLField.text)
+                d.didTapSaveCertificateWithData?(data, URLString: certificateURLField.text!)
             }
         }
         
@@ -127,12 +127,12 @@ class VPNCertificateViewController: UITableViewController, UITextFieldDelegate
     
     func downloadURL() {
         downloading = true
-        if let URL = NSURL(string: certificateURLField.text) {
+        if let URL = NSURL(string: certificateURLField.text!) {
             VPNDownloader().download(URL) {
                 response, data, error in
                 dispatch_async(dispatch_get_main_queue(), {
                     if let err = error {
-                        self.certificateSummaryCell.textLabel!.text = error.localizedDescription
+                        self.certificateSummaryCell.textLabel!.text = error!.localizedDescription
                     } else {
                         self.certificateData = data
                     }

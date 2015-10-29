@@ -22,14 +22,14 @@ extension VPNDataManager
         request.sortDescriptors = [sortByTitle, sortByServer, sortByType]
         
         if let moc = managedObjectContext {
-            if let results = moc.executeFetchRequest(request, error: nil) as! [VPN]? {
+             let results = try! moc.executeFetchRequest(request) as! [VPN]
                 for vpn in results {
                     if vpn.deleted {
                         continue
                     }
                     vpns.append(vpn)
                 }
-            }
+            
         }
         return vpns
     }
@@ -59,9 +59,10 @@ extension VPNDataManager
         vpn.certificateURL = certificateURL
         
         var error: NSError?
-        if !managedObjectContext!.save(&error) {
-            debugPrintln("Could not save VPN \(error), \(error?.userInfo)")
-        } else {
+        do{
+            try managedObjectContext?.save()
+        }catch{
+        }
             saveContext()
             
             if !vpn.objectID.temporaryID {
@@ -74,7 +75,7 @@ extension VPNDataManager
                 }
                 return vpn
             }
-        }
+        
         
         return .None
     }
@@ -88,7 +89,7 @@ extension VPNDataManager
         managedObjectContext!.deleteObject(vpn)
         
         var saveError: NSError?
-        managedObjectContext!.save(&saveError)
+        try? managedObjectContext!.save()
         saveContext()
         
         if let activatedVPNID = VPNManager.sharedManager.activatedVPNID {
@@ -111,14 +112,13 @@ extension VPNDataManager
             return .None
         }
         
-        var result = managedObjectContext?.existingObjectWithID(ID, error: &error)
+        var result = try? managedObjectContext?.existingObjectWithID(ID)
         if let vpn = result {
-            if !vpn.deleted {
-                managedObjectContext?.refreshObject(vpn, mergeChanges: true)
+            if !vpn!.deleted {
+                managedObjectContext?.refreshObject(vpn!, mergeChanges: true)
                 return vpn as? VPN
             }
         } else {
-            debugPrintln("Fetch error: \(error)")
             return .None
         }
         return .None
@@ -127,13 +127,13 @@ extension VPNDataManager
     func VPNByIDString(ID: String) -> VPN?
     {
         if let URL = NSURL(string: ID) {
-            if let scheme = URL.scheme {
+             let scheme = URL.scheme
                 if scheme.lowercaseString == "x-coredata" {
                     if let moid = persistentStoreCoordinator!.managedObjectIDForURIRepresentation(URL) {
                         return VPNByID(moid)
                     }
                 }
-            }
+            
         }
         return .None
     }
@@ -145,7 +145,7 @@ extension VPNDataManager
         request.predicate = predicate
         
         var error: NSError?
-        let fetchResults = managedObjectContext!.executeFetchRequest(request, error: &error) as! [VPN]?
+        let fetchResults = try? managedObjectContext!.executeFetchRequest(request) as! [VPN]
         
         if let results = fetchResults {
             for vpn in results {
@@ -155,7 +155,6 @@ extension VPNDataManager
                 vpns.append(vpn)
             }
         } else {
-            debugPrintln("Failed to fetch VPNs: \(error?.localizedDescription)")
         }
         
         return vpns

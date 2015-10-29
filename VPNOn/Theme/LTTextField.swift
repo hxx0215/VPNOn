@@ -13,9 +13,9 @@ class LTTextField: UITextField {
     override func drawPlaceholderInRect(rect: CGRect) {
         LTDarkTheme().placeholderColor.setFill()
         
-        let attributes: [NSObject: AnyObject] = [
+        let attributes: [String : AnyObject] = [
             NSForegroundColorAttributeName: LTThemeManager.sharedManager.currentTheme!.placeholderColor,
-            NSFontAttributeName: font
+            NSFontAttributeName: font!
         ]
         
         let middleRect = fixedMiddlePlaceholderRect(rect)
@@ -24,7 +24,7 @@ class LTTextField: UITextField {
     }
     
     private func fixedMiddlePlaceholderRect(rect: CGRect) -> CGRect {
-        return CGRectMake(bounds.origin.x, bounds.origin.y + (rect.size.height - font.pointSize) / 2 - 2, rect.size.width, font.pointSize * 1.3)
+        return CGRectMake(bounds.origin.x, bounds.origin.y + (rect.size.height - font!.pointSize) / 2 - 2, rect.size.width, font!.pointSize * 1.3)
     }
 
 }

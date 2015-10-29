@@ -19,7 +19,7 @@ let SecAttrAccount: String! = kSecAttrAccount as String
 let SecReturnPersistentRef: String! = kSecReturnPersistentRef as String
 
 @objc(KeychainWrapper)
-final public class KeychainWrapper {
+final public class KeychainWrapper : NSObject{
     private struct internalVars {
         static var serviceName: String = ""
     }
@@ -86,15 +86,10 @@ final public class KeychainWrapper {
         keychainQueryDictionary[SecReturnData] = kCFBooleanTrue
         
         // Search
-        var searchResultRef: Unmanaged<AnyObject>?
+        var searchResultRef:UnsafeMutablePointer<AnyObject?>
         var keychainValue: NSData?
         
-        let status: OSStatus = SecItemCopyMatching(keychainQueryDictionary, &searchResultRef)
-        
-        if status == noErr {
-            if let resultRef = searchResultRef {
-                keychainValue = resultRef.takeUnretainedValue() as? NSData
-            }
+        withUnsafeMutablePointer(&keychainValue) {SecItemCopyMatching(keychainQueryDictionary, UnsafeMutablePointer($0))
         }
         
         return keychainValue;
@@ -109,16 +104,12 @@ final public class KeychainWrapper {
         keychainQueryDictionary[SecReturnPersistentRef] = kCFBooleanTrue
         
         // Search
-        var searchResultRef: Unmanaged<AnyObject>?
+        var searchResultRef: UnsafeMutablePointer<AnyObject?>//Unmanaged<AnyObject>?
         var keychainValue: NSData?
         
-        let status: OSStatus = SecItemCopyMatching(keychainQueryDictionary, &searchResultRef)
-        
-        if status == noErr {
-            if let resultRef = searchResultRef {
-                keychainValue = resultRef.takeUnretainedValue() as? NSData
-            }
+        withUnsafeMutablePointer(&keychainValue) {SecItemCopyMatching(keychainQueryDictionary, UnsafeMutablePointer($0))
         }
+        
         
         return keychainValue;
     }

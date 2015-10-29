@@ -35,11 +35,11 @@ extension VPNManager
         get {
             if let ID = self.activatedVPNID {
                 if let URL = NSURL(string: ID) {
-                    if let scheme = URL.scheme {
-                        if scheme.isEmpty {
-                            return true
-                        }
-                    } else {
+                    let scheme = URL.scheme
+                    if scheme.isEmpty {
+                        return true
+                    }
+                     else {
                         return true
                     }
                 }

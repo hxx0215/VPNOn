@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-let kAppGroupIdentifier = "group.VPNOn"
+let kAppGroupIdentifier = "group.hxx.vpnOn"
 
 class VPNDataManager
 {
@@ -58,18 +58,18 @@ class VPNDataManager
         
         var error: NSError? = nil
         if let store = coordinator!.persistentStoreForURL(url) { }
-        else if coordinator!.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: options as [NSObject : AnyObject] as [NSObject : AnyObject], error: &error) == nil {
-            coordinator = nil
-            // Report any error we got.
-            let dict = NSMutableDictionary()
-            dict[NSLocalizedDescriptionKey] = "Failed to initialize the application's saved data"
-            dict[NSLocalizedFailureReasonErrorKey] = failureReason
-            dict[NSUnderlyingErrorKey] = error
-            error = NSError(domain: "com.LexTang.VPNOn", code: 9999, userInfo: dict as [NSObject : AnyObject])
-            // Replace this with code to handle the error appropriately.
-            // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            NSLog("Unresolved error \(error), \(error!.userInfo)")
-            abort()
+        else {
+            do{
+                try! coordinator!.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: options as [NSObject : AnyObject] as [NSObject : AnyObject])
+            }catch{
+                coordinator = nil
+                // Report any error we got.
+                let dict = NSMutableDictionary()
+                dict[NSLocalizedDescriptionKey] = "Failed to initialize the application's saved data"
+                dict[NSLocalizedFailureReasonErrorKey] = failureReason
+                abort()
+                
+            }
         }
         
         return coordinator
@@ -105,18 +105,13 @@ class VPNDataManager
             forKeys: [NSMigratePersistentStoresAutomaticallyOption, NSInferMappingModelAutomaticallyOption, "journal_mode"])
         
         var srcError: NSError?
-        if coordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: srcURL, options: options as [NSObject : AnyObject] as [NSObject : AnyObject], error: &srcError) == nil {
-            debugPrintln("Failed to add src store: \(srcError)")
-            return
-        }
+        try? coordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: srcURL, options: options as [NSObject : AnyObject] as [NSObject : AnyObject])
         
         if let oldStore = coordinator.persistentStoreForURL(srcURL) {
             var migrationError: NSError?
-            if coordinator.migratePersistentStore(oldStore, toURL: dstURL, options: options as [NSObject : AnyObject], withType: NSSQLiteStoreType, error: &migrationError) == nil {
-                debugPrintln("Failed to migrate CoreData: \(migrationError)")
-            } else {
-                NSFileManager.defaultManager().removeItemAtPath(srcURL.path!, error: nil)
-            }
+            try? coordinator.migratePersistentStore(oldStore, toURL: dstURL, options: options as [NSObject : AnyObject], withType: NSSQLiteStoreType)
+            try? NSFileManager.defaultManager().removeItemAtPath(srcURL.path!)
+            
         }
     }
     
@@ -125,12 +120,16 @@ class VPNDataManager
     func saveContext () {
         if let moc = self.managedObjectContext {
             var error: NSError? = nil
-            if moc.hasChanges && !moc.save(&error) {
+            if moc.hasChanges {
+                do{
+                    try moc.save()
+                }catch{
+                    abort()
+                }
+            }
                 // Replace this implementation with code to handle the error appropriately.
                 // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                NSLog("Unresolved error \(error), \(error!.userInfo)")
-                abort()
             }
         }
-    }
+    
 }

@@ -38,9 +38,9 @@ public class VPN : NSManagedObject{
     @NSManaged var certificateURL: String?
     
     var ID : String {
-        if let id = objectID.URIRepresentation().absoluteString {
-            return id
-        }
+        let id = objectID.URIRepresentation().absoluteString
+        return id
+        
         return ""
     }
     

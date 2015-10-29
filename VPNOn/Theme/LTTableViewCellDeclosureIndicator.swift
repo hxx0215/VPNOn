@@ -28,8 +28,8 @@ class LTTableViewCellDeclosureIndicator: UIView
         CGContextAddLineToPoint(context, x - r, y + r)
         
         CGContextSetLineWidth(context, 2)
-        CGContextSetLineJoin(context, kCGLineJoinMiter)
-        CGContextSetLineCap(context, kCGLineCapSquare)
+        CGContextSetLineJoin(context, .Miter)
+        CGContextSetLineCap(context, .Square)
         
         CGContextSetStrokeColorWithColor(context, LTThemeManager.sharedManager.currentTheme!.textColor.CGColor)
         

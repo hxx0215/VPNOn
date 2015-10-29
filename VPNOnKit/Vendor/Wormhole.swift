@@ -52,13 +52,13 @@ public class Wormhole: NSObject {
             
             if success {
                 if let center = CFNotificationCenterGetDarwinNotifyCenter() {
-                    CFNotificationCenterPostNotification(center, identifier, nil, nil, 1)
+                    CFNotificationCenterPostNotification(center, identifier, nil, nil, true)
                 }
             }
             
         } else {
             if let center = CFNotificationCenterGetDarwinNotifyCenter() {
-                CFNotificationCenterPostNotification(center, identifier, nil, nil, 1)
+                CFNotificationCenterPostNotification(center, identifier, nil, nil, true)
             }
         }
     }
@@ -160,7 +160,7 @@ public class Wormhole: NSObject {
         
         if let filePath = filePathForIdentifier(identifier) {
             let fileManager = NSFileManager.defaultManager()
-            fileManager.removeItemAtPath(filePath, error: nil)
+            try! fileManager.removeItemAtPath(filePath)
         }
     }
     
@@ -170,11 +170,11 @@ public class Wormhole: NSObject {
             
             let fileManager = NSFileManager.defaultManager()
             
-            if let fileNames = fileManager.contentsOfDirectoryAtPath(directoryPath, error: nil) as? [String] {
+            if let fileNames = try! fileManager.contentsOfDirectoryAtPath(directoryPath) as? [String] {
                 
                 for fileName in fileNames {
-                    let filePath = directoryPath.stringByAppendingPathComponent(fileName)
-                    fileManager.removeItemAtPath(filePath, error: nil)
+                    let filePath = NSURL(string: directoryPath)?.URLByAppendingPathComponent(fileName)
+                    try! fileManager.removeItemAtPath((filePath?.absoluteString)!)
                 }
             }
         }
@@ -190,7 +190,8 @@ public class Wormhole: NSObject {
         
         if let directoryPath = messagePassingDirectoryPath() {
             let fileName = identifier + ".archive"
-            let filePath = directoryPath.stringByAppendingPathComponent(fileName)
+            
+            let filePath = NSURL(string: directoryPath)?.URLByAppendingPathComponent(fileName).absoluteString
             
             return filePath
         }
@@ -205,9 +206,8 @@ public class Wormhole: NSObject {
         if let
             appGroupContainer = fileManager.containerURLForSecurityApplicationGroupIdentifier(self.appGroupIdentifier),
             appGroupContainerPath = appGroupContainer.path {
-                let directoryPath = appGroupContainerPath.stringByAppendingPathComponent(messageDirectoryName)
-                
-                fileManager.createDirectoryAtPath(directoryPath, withIntermediateDirectories: true, attributes: nil, error: nil)
+                let directoryPath = NSURL(string: appGroupContainerPath)?.URLByAppendingPathComponent(messageDirectoryName).path
+                try! fileManager.createDirectoryAtPath(directoryPath!, withIntermediateDirectories: true, attributes: nil)
                 
                 return directoryPath
         }
